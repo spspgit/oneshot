@@ -1,0 +1,448 @@
+组件开发教程
+I.介绍
+在TopCoder开发
+
+TopCoder会在多种语言下开发组件，包括C#,Java,C++,Ruby,Flex,JavaScript等等。虽然语言可能基本不同，但是开发流程是一样的。这个教程将涉及所有自始至终的开发流程。当流程不同时，会给出不同语言的说明。
+
+开发流程
+
+开发流程在高层看是简单的。你的任务是将设计者准备的一个组件设计做成一个实现功能的组件。组件设计会在Design Review Board进行评估。如果你赢了比赛，你需要根据Review Board的建议进行修改。一旦你的组件到了Final Review，你就完成了。
+（有时组件较小可以直接开发，设计阶段就没有了。这样的话，会给出一个需求文档）
+TopCoder需要对设计开发流程提供重要的文档；如果你没有这样做，你应该仔细看一下软件开发文档归档（ http://www.topcoder.com/wiki/display/tc/Component+Development+Documentation ）你应该关注以下文档，TopCoder会员指导，开发设计，评审记分卡文档。文档会告知对你的提交有什么期望。
+
+要求的软件
+
+你可以在自己喜欢的环境下写源码。但是我们依靠特定的技术去build和package组件。我们也依赖每种语言共有的引用库。详细的包列举如下。
+一个所有语言共有的工具是TopCoder UML Tool（ http://www.topcoder.com/tc?module=Static&d1=dev&d2=umltool&d3=description&node=des_uml_tooll ）
+
+C#
+Microsoft .NET Framework v3.5 - http://msdn.microsoft.com/en-us/netframework/cc378097.aspx - 如果你想用C#开发，你可能已经安装了它。它可以从Windows更新中获取，或者使用链接。
+NUnit - http://www.nunit.org/ - NUnit是一个供你快速准确测试代码的框架。单元测试将在VI部分详细说明。
+MSBuild	- http://msdn.microsoft.com/en-us/library/0k6kkbsd.aspx - MSBuild 是微软和Visual Studio的build系统。它可以作为一个.NET重分发免费得到。更多信息请看链接。build脚本会在III部分详细说明。
+TC Code Documenter - http://www.topcoder.com/wiki/display/projects/Code+Documenter - Code Documenter是一个命令行实用程序，能够以相同方式形成API文档，类似于JavaDoc和nDoc for C#/.NET 1.0。目标语言是C#.
+NCover	- http://ncover.org/	- NCover是一个代码覆盖工具。
+
+Java
+Sun JAVA SE 5.0+	- http://java.sun.com/javase/downloads/index.jsp - Java开发通常针对最新的JDK。你应该随时从Sun更新到最新版本。
+Ant - http://ant.apache.org/	- Ant是一个执行自定义可扩展build脚本的实用工具。你要用这个工具来编译你的项目，然后提交到TopCoder。build脚本将在III部分详细说明。
+JUnit - http://www.junit.org/ - JUnit是一个让你快速准确测试代码的框架。单元测试将在VI部分详细说明。
+Sun JAVA EE - http://java.sun.com/javase/downloads/index.jsp - 只有一小部分组件需要这个包。在安装这个软件前，你最好看看你感兴趣的项目的需求说明书（requirements specification）。
+Checkstyle - http://checkstyle.sourceforge.net/ - Checkstyle是一个格式检验工具。你应该在提交之前尽可能用它来检测代码格式。
+Cobertura - http://cobertura.sourceforge.net/ - Cobertura是一个Java代码覆盖分析工具。你可以用它确定执行单元测试时源码使用的百分比。
+
+一定要按MSBuild或Ant的要求配置系统环境变量。同时记下xUnit的安装路径；可能配置build脚本需要用到。
+
+注册
+
+你必须先要在TopCoder软件注册，才能参与开发比赛。注册不仅可以让你提交设计开发方案，还能参与其他比赛，包括算法，概念化conceptualization, 特殊化specification, 工程architecture, 应用集成与测试application assembly and testing, 和马拉松marathon。点这个链接来注册。http://www.topcoder.com/reg/
+
+II.选择一个项目
+
+选择一个项目是成功提交的第一步。你可以很快得在这里找到正在进行的开发比赛http://www.topcoder.com/tc?module=ViewActiveContests&ph=113 。从这个页面，你可以看到哪个项目开始了，何时注册结束，何时终止提交。这些时间非常重要。你必须在"注册结束"前搞清你对一个开发方案的兴趣。你的全部方案和测试文档要在"提交终止"前完成。payment表示第一名的奖金。第二名也会给予一半的奖金。"DR points"表示这个项目的Digital Run总分数。详情请看这个页面。http://www.topcoder.com/dr
+
+项目细节
+
+点击项目名称会显示项目细节。这里你能找到项目的详细信息，文档的链接，项目论坛链接，奖金信息，和更全面的时间线。
+
+决定一个项目
+
+当你找到感兴趣的项目之后，要熟悉一下项目的设计文档。最准确的文档时需求说明书（requirements specification）。这个文档包含了项目运用的不同技术（比如SSL,LDAP,ODBC）。如果你还是有兴趣，就读一下组件说明书（component specification），它是一个实现组件更详细的指导。有很多别的文档可以看，但是这两个是决定你是否适合这个项目最重要的了。
+在选择项目之前，确认你又足够的时间完成项目是非常重要的。要为约定时间的开发期考虑一下别的任务与责任。同时，记住组件可能使用那些技术你还不熟悉。你知道在C#中如何使用数据库连接么？你知道java.lang.ref类是如何使用的么？你对一种网络协议了解的足够多，可以实现需要用到它的组件么？一定要看一下组件说明书的1.2,1.3和2节，能够让你熟悉使用的技术。
+
+项目注册
+
+既然你已经找到了一个合适的项目，你也有时间去完成它，你就可以注册了。点击项目细节也没的注册链接来注册项目。
+
+III. 开始 - 环境
+
+注册之后，你会得到项目提交应用和组件论坛的权限。
+
+项目提交和评审
+
+项目提交和评审是所有开发设计比赛的中央枢纽。你将通过这个应用上传你的提交版本，并得到你的评审分数。要开始，点击这里http://software.topcoder.com/review/jsp/login.jsp ，并登陆。一旦登陆后，你将看到一个自己进行中所有项目的列表和状态。点击项目名称靠查看时间线和别的详细信息。屏幕的底部，会有这个开放阶段会用到的按钮。还有，有个按钮叫"Contact Product Manager"。你可以用它在任何时间给产品管理者发送问题、建议、意见或别的信息。
+
+开发者论坛
+
+在项目详细页面会有一个到该项目开发论坛的链接。关于你的项目的最多交流将在论坛进行。通过你的TopCoder用户名和密码，你可以进入该组件的开发者论坛。如果不行，直接联系你的产品管理员。
+
+开发分布（Development Distribution）
+
+在开发论坛上有四个主要部分：设计阶段文档（Design Phase Documents），设计阶段问题，开发阶段文档，开发阶段问题。你将早开发阶段文档中找到你的组件开发分布。开发分布应该包含能够启动开发的所有必要的文件和文档。
+Java分布通常是jar格式，.NET分布通常是zip格式。两者都能用upzip工具解包。
+
+！注意：我们正在将开发分布的下载从论坛移动到竞赛概况页面。所有的分布会最终以这种方式提供，但是会有部分组件的分布还在论坛上的过渡阶段。
+
+内容
+
+/conf - 这个目录如果存在，将包含你组件的配置文件。有时会包含你提交的组件依赖的配置，或设计者给出的样例配置文件。如果在设计阶段没有建立这些文件，你就不会在你的分布中找到这个目录。
+/doc - 这个目录包含所有当前你组件的文档。这包含了一个.tcuml格式的UML设计说明，需求和组件说明。设计文档将在IV部分详细说明。
+/src - 这个目录包含你完成项目时的所有源文件。在分布中，通常这里只有一个空目录。开发者负责源码文件的建立，将在IV部分详细说明。
+/test_files - 这个目录包含测试时的所有文件。它能包含特殊或极端的配置文件，输入输出和结果示例，数据库架构，和其他不能编译的测试需求。分布将常常包含一些开发者建立的样例测试数据。
+
+Java
+
+/META-INF - 这个目录是jar打包者建立的，可以忽略。
+/build.xml - 这是默认可能是没有配置的build脚本。build脚本将在III部分详细说明。
+/build-dependencies.xml - 这是一个片段，包含了组件的依赖定义。这也会在III部分详细说明。
+/build.version - 这是一个配置文件，包含项目的元信息（meta information），包括名称，版本，源代码目录和包定义。
+
+C#
+
+/<project name>.sln - 这是Visual Studio的解决方案文件，包含下面的两个工程。
+/Component Sources.csproj - 这是工程文件定义了包含主源代码（在main目录下）的工程。
+/Component Tests.csproj - 这个工程文件定义了包含测试源代码（在tests目录下）的工程。
+/Build.dependencies - 这是依赖定义工程。这将在III部分详细说明。
+/Build.version - 这是一个配置文件，包含项目的元信息（meta information），包括名称，版本，源代码目录和包定义。
+/README.txt - 这个文件很好的解释了如何安装build这个组件。
+
+搭建你的环境
+
+第一，你需要确定一个工作目录。适合的例子有C:\working\, C:\proj\, ~/projects/或你可以放代码的什么地方。建议为TopCoder项目建立一个新的目录，来减小混淆，减少提交错误文件的可能。这个教程中，我们将假设工作目录是/proj/tc/。
+一旦你已经找到一个地方存放你的工程，解压缩分布。这个目录/proj/tc/project-name将代表你的项目目录。这个教程中，我们假设你的项目名称是tutorial_gen。下一步是配置build脚本。记住TopCoder Software(TCS)不会使用build脚本：不要花太长时间在这儿。做以下调整来修复路径和引用库。如果你有重大问题，请与你的项目管理员联系。
+
+Java Build脚本 - build.xml
+
+你需要在这个脚本中设置cobertura目录。
+<property name="cobertura.dir" value="${ext_libdir}/cobertura/1.8"/>
+很多时候，你只需要设置这个。
+
+Java Build脚本 - build-dependencies.xml
+
+如果你不能将JUnit jar加入你的classpath，你应该在build依赖中包含它。改成正确的路径。
+<property name="junit.jar" value="${ext_libdir}/junit/4.6/junit.jar"/>
+如果你的项目要求附加库，你就需要配置你的build依赖来对它们在build和运行时负责。这是一个TopCoder库的例子。
+<property name="spell_check.version" value="1.0"/>
+<property name="spell_check.jar.name" value="spell_check.jar"/>
+<property name="spell_check.path" value="spell_check/${spell_check.version}"/>
+<property name="spell_check.jar" value="${tcs_libdir}/${spell_check.path}/${spell_check.jar.name}"/>
+这允许简单配置不同版本的库使用最少的build编辑。你可以记录引用到：
+${tcs_libdir}
+这应该已经被定义在配置脚本的最顶部，如下：
+<property name="tcs_libdir" value="lib/tcs" />
+这个配置将找到拼写查询库jar在/proj/tc/tutorial_gen/lib/tcs/spell_check/1.0/spell_check.jar。你可以视情况修改配置脚本，通过修改上方的路径和文件名属性。你必须包含所有组件build或运行所需的库。依赖classpath比较有用，包含所有需要的库在这里是一个比较好的实践。
+Topcoder登记(catalog)依赖在这里http://software.topcoder.com/catalog/c_showroom.jsp。
+
+Java - topcoder_global.properties
+
+你可能已经注意到了，你的分发中的build.xml包含了一个引用到一个文件名为topcoder_global.properties。使用这个文件你能设置那些不同项目都不会变化的属性，比如path到1.3 JRE。这个格式很简单（并试用与所有Java属性文件）。
+propertyname=name
+第一，在你项目目录下建立topcoder_global.properties，如果你的工程目录是/proj/tc/tutorial-gen，你的properties文件应该在/proj/tc/。现在你可以设置所有build脚本的公共属性了。对于JRE，你可以添加：
+java_1_3_bootclasspath=C:\Program Files\JavaSoft\JRE\1.3.1_10\lib\rt.jar
+你也可以添加注释到这个文件。
+# I need a comment to remember what this means.
+java_1_3_bootclasspath=C:\Program Files\JavaSoft\JRE\1.3.1_10\lib\rt.jar
+你也可以使用属性扩展。
+java_home=C:\Program Files\JavaSoft\JRE\1.3.1_10
+java_1_3_bootclasspath=${java_home}\lib\rt.jar
+记住你的topcoder_global.properties引用在你的build.xml一开头。这说明build.xml中的属性不会扩展到你的属性文件（它们还没定义呢）。也要注意topcoder_global.properties中的属性设置将总是覆盖build.xml中的设置。更多信息看一下Ant文档。http://ant.apache.org/manual/CoreTasks/property.html
+
+C# Build脚本
+
+在这两个工程中(Component Sources和Component Tests)有一些被引用的一般build目标。但是它们不在开发分布中。你能在这里下载。http://www.topcoder.com/wiki/download/attachments/23727045/master_build_files.zip 之后，解压它们并将目标文件放到你项目的父目录中。比如，你现在的项目是/proj/tc/tutorial-gen,你的目标文件将在/proj/tc中。
+MSBuild脚本配置简单，因为项目文件可以直接被MS Visual Studio打开。只要打开sln文件，两个工程会以引用的方式添加依赖到项目。这样就完成了。
+依赖也可以通过编辑Build.dependencies文件，全部手动进行添加。
+在ItemGroup段中，包含了依赖信息，找到Sources和Tests工程的相关段，添加你的项目所需要的。比如：
+对于TopCoder Software(TSC)组件，
+<Reference Include="Hera.EPC.Data, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>lib\Hera.EPC.Data.dll</HintPath>
+</Reference>
+对于第三方库，
+<Reference Include="log4net, Version=1.2.9.0, Culture=neutral, PublicKeyToken=b32731d11ce58905">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>lib\log4net.dll</HintPath>
+</Reference>
+对于.NET系统库，
+<Reference Include="System.Core, Version=3.5.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+</Reference>
+设计者或项目管理者可能提供别的设计文件，比如示例配置文件或数据库定义。
+
+开发流程
+
+你在开发流程中要实现一个已经通过评审的设计。因此，你应该以设计文档中的公共API为标准。在未能从项目管理者和设计者那里得到认可时，你不能偏离公共API。包括：添加或删除公共类，方法和接口。不是说每个设计都是没有瑕疵的，正相反。几乎每个设计都有改进的空间。但是，对设计决定的分歧是在设计修订中解决的，而不是在开发阶段做。开发流程的实现阶段不是纠正设计问题的合适时机，除非对项目是致命的。TopCoder对设计变成采用一套全面评审流程。
+如果你对下一个设计版本有任何改进和洞察，请在论坛发帖。如果你在设计中遇到了任何问题，马上在开发论坛上提出。越早注意到冲突和问题，就能越早解决。如果有时间可以阅读设计论坛上的帖子。有可能问题早已被找到并处理过了。此外，如果你看到任何没有被解决的问题，请在开发者论坛提出...没什么坏处！
+综上所述，在实现过程中提倡做任何可能改进。如果你能重构公共类的行为到私有帮助类：去做吧！如果你能想出比设计更有效的数据获取或处理算法：太好了！只有公共API和组件行为（从用户角度看）是设计中一成不变的。根本上说，你不能改变项目的"what"，但是你可以自由的改进"how"。
+
+开发创新
+
+不同的设计允许不同程度的开发阶段创新。一部分是设计自身的复杂程度造成的，一部分是设计的方法造成的。设计可以完全描述组件，组件开发就仅限于将伪代码转为要求的编程语言。设计也可以严格定义公共API，让开发者提供所有的实现细节。但是更多的设计，两者兼有。
+实现函数体是很常见的，其中开发者可以运用自己的想法（twist）。添加设计文档中没有明确要求的私有或内部方法，构造和类对于某些设计可能是合理的甚至是必须的。当你做这些添加时，你要确定它们是必须和恰当的，因为这些部分很容易受到开发评审委员会的详细审查。开发者的添加（像组件的其他元素）通常应该有最小的作用域和最多的访问约束来符合它们的使用。为解决当前任务，请确认在任何地方使用最适合的对象和源类型。
+
+生成存根
+
+实际开发的第一步是生成存根。存根是可编译代码的骨架。虽然你只能看到函数体，但是它却是一个简单的存根。存根具备最终组件的所有API，但是没有逻辑。TopCoder UML工具可以为你生成存根。记住你得到存根代码可能不能编译。你需要确认近似（approximations）和外部引用能够被解析。比如，一个.NET组件，设计可能需要建立一个所有系统类型的替代对象。你就需要删掉这些。
+另一个生成存根的普遍问题是关联部分。很多关系（如聚合和组合）在UML文档中没法反应成正确的代码。你有责任将API文档（UML文档和组件特性）进行恰当地翻译成可编译的代码。
+
+项目结构
+
+项目的源码在项目目录的/src下。这样，你的项目应该如下组织（在例子的情况下是/proj/tc/tutorial_gen/）
+
+conf/	你的组件所需的任何配置文件。
+docs/	你项目的所有文档。
+lib/	你的所有本地库。
+src/	所有的源码（包括测试代码）。
+test_files/	测试中用到的所有非编译文件。
+
+Java
+
+你组件的代码存储在/src/java/main目录下。你需要在那儿按项目的包来组织你的源码。比如，如果你的组件是com.topcoder.util.tutorial，你的完整路径应该是/src/java/main/com/topcoder/util/tutorial/。下面是Java的特定路径。
+
+lib/tcs/spell_check/1.0/spell_check.jar	在这个例子中，这是一个Tutorial Generator所依赖的组件。你的组件可能不依赖任何组件，也可能依赖很多组件。
+src/java/main/	你的组件代码在这里。
+src/java/main/com/topcoder/util/tutorial/	在这个例子中，这是存根的合适位置。你的工程中路径可能不同。
+
+C#
+
+你的组件代码将存在/src/csharp/main/目录下。你需要在那儿按项目的包来组织你的源码。比如你的组件是TopCoder.Util.Tutorial.dll，你的完整源码路径应该是/src/csharp/main/TopCoder/Util/Tutorial/。下面是C#的特定路径。虽然C#的命名空间不用要求和Java包的目录安排一样，但是TopCoder是根据命名空间安排源码文件的。
+
+lib/TopCoder.Util.SpellCheck.dll	在这个例子中，这是一个Tutorial Generator所依赖的组件。你的组件可能不依赖任何组件，也可能依赖很多组件。
+src/csharp/main/	你的组件代码在这里。
+src/csharp/main/TopCoder/Util/Tutorial/	在这个例子中，这是存根的合适位置。你的工程中路径可能不同。
+
+Build你的项目
+
+一段你生成并清理了你的存根，你就能用build脚本build你的组件了。你只需要执行从命令行对一个目标执行你的build工具来完成build。这是Ant的build目标：
+
+compile	这个目标将把你的项目编译成全功能的二进制单元（假设源码正确）。
+compile_tests	这个目标将编译你的测试。它依赖于成功的compile。
+test	这个目标将运行测试。它依赖于成功的compile_tests。测试执行后，结果可以在/log目录下找到。
+coveragereport	这个目标将执行测试生成覆盖报告。你可以在log/coverage目录下找到结果。
+clean	这个目标会清理/build目录，删除所有编译的代码和中间文件。
+dev_submission	这个目标将会生成一个打包的提交版，项目完成后你可以通过"Project Submit and Review"将提交版上传。
+
+这是MSBuild的build目标：
+
+Build	这个目标将把.cs文件编译到/build目录下。
+Test	 这个目标（从Component Tests项目运行）将运行测试用例并输出nunit结果到/log。
+NCoverReport	 这个组件（从Component Tests项目运行）将生成组件的测试覆盖报告到/log。
+FxCop	 这个目标（从Component Tests项目运行）将生成关于集成的信息报告，比如可能的设计，本地化，性能和安全改进。
+Doc 这个目标将为组件生成javadoc风格的API文档。
+Dist	 这个目标将为部署生成二进制分发，依赖于Build。
+CleanSolution	 这个目标将删除、build下所有编译的代码和/log下的内容。
+
+想要执行一个build目标，你只需要进入你build脚本所在的目录（应该是工程的根目录），执行ant <target>或MSBuild <project> <target>。确认你已经配置好了Ant或MSBuild来允许命令行执行，否则这步不能实现。
+NAnt Build 示例 http://www.topcoder.com/i/development/nantbuild.html
+Ant Build 示例 http://www.topcoder.com/i/development/antbuild.html
+你的组件应该总是用存根进行干净的build。如果它们不能编译，你可能有API的问题，或库配置问题。现在这是很容易解决的问题了，在你写任何测试和代码前，你应该这样做如果可以。
+
+你可以离开了
+
+到教程的这里，你应该可以开发你的项目了。有关开发技术和策略的更多信息不在此文档的范围内。但是下面几个部分，我们会介绍文档，单元测试，所有项目的开发普遍问题。
+
+IV. 你的提交工作 - 文档
+
+文档是一个有用可维持的组件的关键。如果你在写代码时做了文档，你可能不会注意到写一个项目文档的价值。你的提交将被通过文档质量评估。加之，文档越好，评审委员会越容易理解和评价你的代码，你的总分也会更高。
+
+API文档
+
+从UML文档自动生成的API文档是为了让你来使用的，并不是最终文档。在Java，API是通过javadoc注释来记录的，在C#通过XML注释记录。所有的类，接口，方法和变量必须记录到文档。下面是每种类型的例子。
+
+Java
+很多Java的IDE（比如Eclipse或IDEA）会在你键入代码时自动生成API文档。
+
+/**
+* Saves the file to permanent storage, on the path specified by configuration. The path
+* must not begin with a backslash, and must not contain any special characters (see component
+* specification). If the filename cannot be used, an exception will be thrown.
+*
+* @param filename The filename to save to. May not be null or empty.
+* @throws IllegalArgumentException If filename is null.
+* @throws IllegalArgumentException If filename is not valid (zero length, invalid characters, etc).
+* @throws IOException If an error is encountered while saving the file.
+*/
+public void saveAs(string filename)
+
+javadoc注释的更多信息，请看这里。http://java.sun.com/j2se/javadoc/writingdoccomments/index.html
+
+C#
+
+在你写代码时，Visual Studio.NET将为你生成很多XML文档。只要在声明前面键入///。
+
+/// <summary>
+/// Saves the file to permanent storage, on the path specified by configuration. The path
+/// must not begin with a backslash, and must not contain any special characters (see component
+/// specification). If the filename cannot be used, an exception will be thrown.
+/// </summary>
+/// <param name="filename">The filename to save to. May not be null or empty.</param>
+/// <exception cref= "ArgumentNullException">If filename is null.</exception>
+/// <exception cref="ArgumentException">If filename is not valid
+/// (zero length, invalid characters, etc).</exception>
+/// <exception cref="IOException">If an error is encountered while saving the file.</exception>
+public override void SaveAs(string filename)
+
+虽然C#没有检测异常抛出，但是在API文档中记录函数可能产生的预期异常是一个很好的实践。更多有关XML文档的信息，请看这里。http://msdn.microsoft.com/msdnmag/issues/02/06/XMLC/default.aspx
+
+文档内容
+
+解释组件的行为，非法输入和失败行为。如果对象基于特定的操作产生变化，确认这是清楚的（虽然List.add(object)是一个明显的变化，List.screenedAccept(object, bool)可能不那么明显[即使对你来说明显]）。确认记录返回值，所有异常和所有参数。加之，你项目中的每个类和接口都应该有摘要说明，说明它的一般功能和组件中的位置。它们（不包括异常和枚举）也应该有线程安全信息。
+在主类中添加配置示例和组件使用示例，也是一个很好的实践。
+你不应该在你的提交中包含任何个人可辨认信息。要使用你的TCS用户名的地方（比如在 @tag 标签中），请使用TCSDEVELOPER。这帮助让评审更加公正客观。当你获胜之后，你将要修改代码包含你的用户名（在最终修改过程中）。
+
+文档的听众
+
+你的API文档的听众将是组件的使用者；TopCoder软件的客户。在文档中总是要保持专业语调。用主动的声音。尽可能的描述，想象使用者可能不熟悉语言和组件。
+像前面提到的，从UML源形成的文档不适合最终的产品。比如，你对于上面的SaveAs函数可能收到如下的表述：
+从配置文件获取路径，然后增加文件名传入。尝试保存文件到那个路径，否则就抛出异常。非法输入：null，空，特殊字符（funny characters），非文件系统 安全合法输入：其他的 抛出：在失败时为IOException，如果非法输入则是InvalidArgumentException。
+这个文档当然描述了SaveAs函数的功能，但是这只是对于开发者的指导，而不是针对用户的描述性文档。你应该删除实现细节，清楚准确地描述函数的行为。同时，"funny characters"可能是内部开发的合适表述，但不适合于客户。当你完成每个函数后应该使用以上指导方针重写API文档。
+
+内嵌文档
+
+内嵌文档是在代码块中解释代码功能的简单注释。这里的文档可能同时针对可能的组件使用者和TopCoder内部改进人员。做任何编程时，你加的注释越多，代码越容易维护。x+；显然是增加x。不用注释。或者有？loopIndex++可能更合适，或者recordCount++，等等。如果你的代码意图不明显，你就需要做一些注释!
+
+要求的文档
+
+什么是正确的API或内嵌文档，没有硬性的规定，评审有很高的主观性。
+但是有一些基本要求。
+
+每个文件必须包含TopCoder版权通知。
+所有公共API元素必须完全注释（参数，返回类型，异常）。注意：也包括单元测试。
+任何过度复杂或庞大的代码块应该包含一些内嵌注释来解释意图和功能。
+文档在用语和质量上都要专业。
+记住这一章的指导方针，你应该在你的文档上表现好！
+
+V. 你的提交工作 - 单元测试
+
+每个组件不管大小都需要一套测试。这些测试是为了检测组件在给定合适输入是的正确行为，在给定非法输入时的正确失败。我们系统测试的风格源自于极限编程。你没必要一定采用这个风格，但是关于单元测试的思想和方法论的更多信息，可以看这里。http://www.xprogramming.com/  http://junit.sourceforge.net/#Documentation
+在极限编程中，你要先写测试后写代码。再说一遍，这不是必须的，但是可以非常有用。你的API很大程度上是不可变的，所以你应该可以对API写测试，而不去考虑成功与否。利用这一点，可以经常测试。当你填充了存根，很多测试就会通过。
+
+什么是单元测试？
+
+单元测试是针对一个软件正确功能的编程测试，在尽可能小的粒度上进行（比如为功能的每个单元做测试）。这通常意味着测试每个类的每个非公有方法和构造函数。测试应该通过合法状态和输入的范围（包括极限值）来验证正确操作，，也应该为每个可测试的失败情景验证正确失败行为。
+
+测试范围
+
+单元测试的广泛程度可以按自己喜好。有些时候，你的测试代码会比那个单元的代码还多！
+你必须对每个组件的公共方法做一个相关测试。你应该测试准确和失败（合法和非法输入）。输入输出的范围越宽，你越容易暴露缺陷。很难测试全部范围的输入（有时在大输入空间是不可能的）。可是你越接近全部范围输入，你的代码就更健壮。
+除了这些小的原子测试，你应该建立从开始到结束的测试，来探测组件的预期功能。
+
+建立你的测试
+
+你需要做的第一件事是为你的测试建立一个目录。应该在你的src/下。对于测试意图不同语言略有区别。
+
+写C#单元测试 http://apps.topcoder.com/wiki/display/tc/Writing+.Net+Unit+Tests
+写Java单元测试 http://apps.topcoder.com/wiki/display/tc/Writing+Java+Unit+Tests
+
+单元测试的诀窍
+
+将所有单元测试简单的放在一个函数中很有诱惑性。但是这很大程度上降低了测试的效用。在前面的例子中，我们可以简单将三个测试函数连成一个函数，testSaveAs()。我们现在只有一个函数而不是三个了。如果任何三个行为有问题，所有的测试都会失败。在更大的测试中，这个组合测试方法论能够导致很混乱的失败情况，能使调试测试代码变得困难。你的测试越小越原子，就使失败点和可探测原因越明显。
+
+总要实现一个测试版来显示组件的特性。
+总要在断言和失败调用中提供一个有意义的消息。
+总要像组件代码一样编写测试代码文档。
+将你的测试分解为独立的TestCase类。如果一个TestCase不能管理，不要犹豫，把它拆成更多的类。
+在那些类中分解测试到尽可能小的函数中；这样能是组件失败的位置明确。然后你也能使用测试通过和失败的数目作为完成的量度。
+减少代码重复，使用setUp()和tearDown()增加健壮性。
+如果时间允许就使用更多的合法非法输入测试每个公共方法。
+测试预想的组件流程：比如加载，处理数据，保存数据。
+不要忘了清理环境！单元测试应该使系统保持和它们建立时相同的状态；不应该有持久的变化。在开发评价时会检查这个。
+测试类在每个方面应该是普通的，除了它有特殊的重要性要测试框架。这些类可以继承自己和最终测试的中介者。它们可以包含的方法不同于测试方法。它们也有状态。
+因为它们与代码在同一个包或命名空间中，单元测试可以访问包的私有保护类和它们的成员。
+接口不能被直接测试，但是可以用别的实现来提供方法接收接口参数。这个技术潜在的验证组件对接口类型字段和方法参数做了期望的事，同时通过调用这些参数返回了正确的异常。
+使用的所有配置文件和其他资源应该放到test_files目录下。
+在开发过程中，有时依赖还不能用。你需要写伪造类。你也可以使用开源的伪造实用程序像JMock或EasyMock。但是请在使用前同项目管理员确认。
+不要再源码中写死数据库连接。请确认数据库连接是在单独文件中配置的。这个将使测试和build过程更加容易和灵活。这也应用到了其他的配置（比如网络配置）。
+
+VI. 你的提交工作 - 问题
+
+在开发过程中，你可能遇到或多或少的问题。你可能需要从目录找一个组件。设计可能有瑕疵会阻挡开发。你可能对设计者意图或使用的技术有疑问。不要怕，你不是一个人。
+如果你找了任何设计中的混淆或模糊，请在论坛上提出（"Project Submit & Review"可达）。有可能你找到的情况设计者没有考虑到。也可能你理解错了组件或忽视了什么。不管怎样有关组件自身的问题应该在组件论坛上得到解决。
+另外，如果你写代码出现问题，或你不理解要求的技术，或某个方面的bug，你应该去TopCoder的圆桌（Round Tables），而不是开发者论坛。TopCoder圆桌在这里是可用的。常规或组件比赛论坛是寻求帮助的合适地方。圆桌常被很有经验的TopCoder会员和TCS工作人员光顾，他们总是会尽全力来帮助你。
+如果你有问题阻挡了项目开发，请马上发邮件给项目管理者。这包括缺少或损坏的文件，访问或申请问题，主要涉及问题。你也可以通过Project Submit & Review Details页面，给项目管理者发邮件。如果你进不去Project Submit & Review，请给 support@topcoder.com 发邮件。说明你注册的是哪一个组件和你问题的性质。
+交流的恰当方法不是一个readme文件。如果你需要在很大程度上偏离设计，你需要联系设计者和项目管理者。
+
+VII. 提交!
+
+困难的工作结束了，你成功通过了150个单元测试。你准备提交解决方案吧！
+首先，你应该评价你的代码。确认你的提交充分符合评价指导（IX部分）。现在找一些小问题，可以让你在日后的评价流程中获得更多分数。确认你的目录结构适合上述。
+其次，确认你的代码编译了。
+最后，运行build目标dev_submission。这样会build一个你文件的压缩档案。确认验证所有的文件都在压缩档案，添加上缺少文件。你的提交应该包含一个单元测试成功的log，conf/下的所有文件，test_files/下的所有文件。如果有时间你可以解压缩提交版到另一个目录，确认build是干净的。
+一旦你对提交档案满意了，你可以通过Project Submit & Review上传它了。
+
+让你的提交发光
+
+为了在开发比赛中获胜必须让你的提交脱颖而出。对于那些很简单规定很严格的组件，这个非常有技巧性；那些很复杂规定很宽松的组件，甚至也应该得到关注。有很多方法让你的提交发光，但是这里是一些建议：
+
+写干净，清晰，有效的代码。虽然没有评价标准，但是评价者还是倾向于对简单阅读和理解的代码产生好感。有效的代码会在压力基准测试中获得性能优势，也可能是来自评价者的荣誉（一些加分）。
+写可理解的单元测试套件。不充分的测试会让你付出沉重的代价因为有许多评价标准附属于测试套件。测试应该充分覆盖所有非私有方法，也要做好文档。做好测试可能是一个获胜关键，因为单元测试套件是一个经常被忽略的地方。
+提供非常好的文档。类和方法的文档是开发者要做的，很少开发者给予应有的关注。好的文档清晰好理解。阅读和熟悉Javadoc的文档。注意，比如，或多或少的任意HTML可以插入文档注释；恰当使用这个特性可以非常高效。尝试以别的开发者的角度问自己可能想要知道关于组件的什么内容 - 然后把它们加进去。阅读和遵循Sun或Microsoft对特定语言的注释指导和它们关于怎样写API说明书的相关文档。
+充分满足所有需求，提供所有需要的功能。也许这个不用说，但是当除去别的因素后它会影响你的机会。注意特殊用例和不常用输入。
+注意任何设计者忽视和忽略的问题 - 比如线程安全，可移植性（甚至Java和.NET软件都可能有移植性问题）。当你对设计有自由度时，可以在提交中给出令人满意的特点（如上）。
+
+VIII. 评审
+
+给出提交后，评审委员会会按标准进行评判。在评审之前有一个筛选（screening）阶段，你可以在这里 http://software.topcoder.com/review/actions/ViewScorecard.do?method=viewScorecard&scid=30000073 找到一个示例筛选计分卡。你可以在这 http://www.topcoder.com/wiki/display/tc/Sample+Component+Development+Review+Scorecards 看到计分卡的详细说明，并在这里 http://software.topcoder.com/review/actions/ViewScorecard.do?method=viewScorecard&scid=14828418 看到示例评审计分卡。
+
+功能
+
+最重要的是功能。评审委员会会检验是否实现了所有需求，提供了所有设计文档中的功能。应该使用合适的技术来实现（比如，是否恰当地连接了数据库，是否使用了恰当的XML配置？）如果在组件中有复杂的算法，会被设计指出。并鼓励你改进。但是如果你不确定自己的算法是否正确，请在论坛提问。
+
+定义
+
+另一个重要的方面是你的提交是否遵照定义的接口（可见性，类型，修改器，名称，异常列表）。没有设计者或项目管理者的优先批准，删除，添加或改变非私有API是不会被接受的。帮助者（Helper）类与方法可以用，但是你需要把它们限制到最小限度。
+
+代码
+
+评审人员会详细查看代码，看对象类型是否是最好选择。比如，你想用TreeMap存一些值映射。除非你需要保存键顺序，否则你可能应该用HashMap代替。最好的选择这里通常是效率上的。不要有无用的或马虎的代码。你的代码应该足够讲究，能够减少冗余的同时保证代码干净清晰。
+这有些主观，但是又客观参考。你不应该用多层的三元运算符。（比如good ? "great!" : ok ? "I suppose" : bad ? or_is_it ? "darn" : "phew" : "who knows?"）。这不清晰。大块代码同样是这样...如果你的一个函数超过50行，你应该把它分成多个函数。比如如果绘图，你可以用一个drawAxes()函数，一个drawData()函数，一个drawLegend()函数，而不是一长段代码。考虑到效率，小地方可以产生大变化。当你得到想要的值后跳出查询。设置智能标记条件，使用短路求值（short circuit evaluation，逻辑运算中提前跳出）。代码不能过于复杂，能简化就简化。
+包括test用例在内的所有代码都要遵照TopCoder编码约定。我们的编码约定是公布的Java和C#的标准。你可以在下面的链接来查看：
+Java编码约定 http://java.sun.com/docs/codeconv/html/CodeConvTOC.doc.html
+.NET编码约定 http://msdn2.microsoft.com/en-us/library/Aa291593(VS.71).aspx
+
+文档
+
+实现代码包含类，方法和变量的详细文档，要按照Javadoc或XML风格来书写，如同Java或C#编码标准。文档必须句法正确：文档中不要有已经不存在，不恰当的锚或有缺陷的元素。
+
+单元测试
+
+单元测试用例彻底正确地测试所有的方法和构造函数。单元测试用例包含一个组件如何使用的实现或演示。演示应该在要求环境下完成。比如，一个web组件，演示应该作为web应用来提供。
+环境应该尽可能灵活配置。在测试结束后不要还开着文件或连接。总在tear-down方法中清理环境是一个好的实践。
+你的单元测试代码应该像你的组件代码一样来做文档。另外，三个开发评审员每个人会写单元测试来检测你组件的正确性，恰当失败，压力性能。你的组件会根据上述得分和测试得到评分。
+
+IX. 申诉
+
+当评审结束后，你可以用几天来查看和申诉你的分数。你可以看到委员会对每个分数的评论，你可以对任何分数进行争论。请记住你要有非常好的理由来申诉，否则将被拒绝。如果评审员说和设计冲突，或评审疏忽，就随意申诉吧。如果你是获胜者，你有机会在最终修改时讨论评审的评价...
+
+X. 最终修改
+
+恭喜！你是胜利者！
+但是，可能还有工作要做。你的评审计分卡将可以通过"Project Submit & Review"看到，那里有评审委员会对你提交的任何问题。也会包含对你提交的要求或建议修复。
+
+每个单独要求的修改必须要处理。你的组件直到这些完成才能算成品。
+每个建议的修改应该尝试一下。显然他们是按照要求修改的优先级安排的，如果有时间应该完成。
+别忘了将TCSDEVELOPER改成你的真实用户名。
+
+交流
+
+交流在最终修改时要比其他时期更多，也是关键。如果你基于任何理由对评审有问题或评论，请尽快提出。如果有阻挡问题，马上邮件通知项目管理者，并在论坛提出。项目管理者会查看问题，首先确定主要评审者。如果你基于什么理由认为需要修改不能进行，你需要到论坛上说明。最终修改完成前不要再次提交，提交还要包含readme中的注释。 这不会被接受。与评审人员交流来减少冲突！你给出的细节越多，越早，这个环节就越顺利。评审委员会总是对开发者开放；他们可能忽视设计中或你提交中的一些内容。别怕询问评审委员会。问题和评论显示出你的关注和积极参与；没有交流评审委员会不会知道你在做修改时弄不清要求。
+
+XI. 最终提交和评审
+
+这是另外的一个dev_submission build。像之前指导方针一样确认所有文件都成功上传。在重新提交之前做到尽可能完美。这会节省所有人的时间，也包括你。
+如果你已经满足了所有需求，所有评审测试还通过，你的组件就完成了，将会准备添加到目录中。你的工作结束了。
+如果有的还没完成，你会回到最终修复环节。
+
+认可
+
+最终修改由主评审者验证后会标记为"认可"。一个认可阶段开始，认可人员会检查你的提交。如果条件最终得到了认可，项目会结束将进行后续开发。否则，最终修改阶段会重新开启，你需要修改提交解决认可人员的问题。最终修改、最终评审、认可流程将一直继续直到认可人员认可你的工作为止。
+
+XII. 奖
+
+现在恭喜！你可以准备接收奖金了，但是还有要说的！
+
+可靠性奖金
+
+你的档案有一个对于最后15场组件开发的可靠性因子和最后的15场比赛。可靠性因子是最后15个项目评审分数在75分以上的百分比。对于很高的可靠性，一份奖金会在每场获胜后发放。比如，100%可靠性你将会多得到20%。
+要保持高可靠性，你需要在注册后认真完成。在注册前，确认你有足够时间来完成它，并且属性使用的技术。从项目详细页面下载需求说明书，和项目论坛上的组件说明书，来在决策前了解更多详细内容，是一个好办法。
+如果在注册结束前你没有信心能够按时完成，你总是可以取消注册。这可以通过开发人员的在线评审（Online Review）页面 - 有个Unregister链接。你只能在注册结束前取消注册。之后不提交不会影响你的可靠性。
+关于可靠性的更多信息，请看这里。http://www.topcoder.com/wiki/display/tc/Reliability+Ratings+and+Bonuses
+
+数字赛跑（Digital Run）奖金
+
+如果你持续比赛，数字赛跑给你额外奖金。对于每个项目的提交，会有个相关的数字赛跑分数。排名分数将会基于通过评审的提交数目来奖励。
+数字赛跑奖金表示奖励那些一直参加比赛的选手。所以最根本最好的想法是尽量参加很多比赛来得到最高排名。项目的DR分数高会更难，这样提交的人数会少，所以将会是一个赢取分数的机会。
+关于数字赛跑的更多信息，请看这里。http://www.topcoder.com/dr
+
+XIII. 总结
+
+总结一下这个开发教程。你已经注册，开发，测试，提交，评审，认可，获胜，修改，最终提交一遍了。你已经得到你的奖金了，并会从之前的工作收到版税。再一次恭喜。有比找一个别的项目注册再做一遍更好的庆祝方式么？
